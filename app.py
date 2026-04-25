@@ -18,7 +18,7 @@ st.markdown("""<style>
 .parchment-container { background: linear-gradient(to bottom, #f4e4bc, #e6d5a8, #d6c498); border: 8px solid #5c3a1e; border-radius: 4px; box-shadow: inset 0 0 30px rgba(0,0,0,0.2), 10px 10px 20px rgba(0,0,0,0.5); padding: 40px 50px; color: #2b1d0e; font-family: 'Lora', serif; font-size: 1.15rem; line-height: 1.8; margin-bottom: 30px; }
 .parchment-container h1, .parchment-container h2, .parchment-container h3 { font-family: 'Cinzel', serif; color: #5c3a1e; border-bottom: 1px solid #8b6914; padding-bottom: 10px; margin-top: 30px; }
 .parchment-container strong { color: #8b0000; }
-#MainMenu, footer, header { visibility: hidden; }
+[data-testid="stToolbar"], footer { visibility: hidden; }
 </style>""", unsafe_allow_html=True)
 
 st.markdown('<div class="main-title">📜 O Escriba</div>', unsafe_allow_html=True)
