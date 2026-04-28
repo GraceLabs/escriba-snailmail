@@ -42,11 +42,13 @@ col1, col2 = st.columns(2)
 
 with col1:
     personagem = st.text_input("👤 Personagem Principal", help="De quem a história é sobre?")
-    narrador = st.text_input("🗣️ Narrador", help="Quem está escrevendo? Pode ser o próprio personagem ou uma testemunha ocular (ex: um anjo, um discípulo, etc).")
+    narrador = st.text_input("🗣️ Narrador", help="Quem está escrevendo? Pode ser o próprio personagem ou uma testemunha ocular.")
     destinatario = st.text_input("✉️ Destinatário")
     tomm = st.selectbox("🎭 Tom", ["Poético", "Urgente", "Materno", "Solene", "Mistério e Aventura"])
 
 with col2:
+    # NOVO CAMPO DE IDIOMA AQUI
+    idioma = st.selectbox("🌍 Idioma do Manuscrito", ["Português (Brasil)", "Inglês", "Espanhol"])
     versao = st.selectbox("🔍 Versão Bíblica", ["ARA", "NVI", "ARC", "NLT", "ACF"])
     divisoes = st.number_input("📑 Qtd de Cartas", min_value=1, max_value=5, value=2)
     paginas_por_carta = st.number_input("📄 Páginas por Carta", min_value=1, max_value=5, value=2, help="Cada página equivale a cerca de 3 parágrafos densos.")
@@ -57,28 +59,28 @@ st.markdown("")
 gerar_btn = st.button("✒️ Redigir Manuscritos", type="primary", use_container_width=True)
 
 # ==========================================
-# NOVO PROMPT: LINGUAGEM MODERNA + NARRADOR
+# PROMPT ATUALIZADO COM REGRA DE IDIOMA
 # ==========================================
 SYSTEM_PROMPT = """Você é um mestre da escrita épica e adaptador de histórias bíblicas. Sua missão é transformar relatos em manuscritos imersivos, usando uma LINGUAGEM MODERNA E ACESSÍVEL.
 
 REGRA ABSOLUTAS (NÃO QUEBRE NENHUMA DESSAS):
-1. LINGUAGEM MODERNA: Escreva em português atual, elegante, mas sem termos arcaicos ou rebuscados excessivamente (não force palavras como "sículos", "papiros" se não fluir naturalmente). A leitura deve ser fluida como um livro contemporâneo de alta qualidade.
-2. DINÂMICA NARRADOR X PERSONAGEM:
-- O "Personagem Principal" é o SUJEITO da história (sobre quem estamos falando).
+1. IDIOMA OBRIGATÓRIO: O manuscrito inteiro (cabeçalhos, corpo do texto, despedidas) DEVE ser escrito estritamente no idioma selecionado pelo usuário. Se o idioma for Inglês, escreva em inglês impecável. Se for Espanhol, escreva em espanhol impecável. Mantenha o mesmo nível de qualidade literária em qualquer idioma.
+2. LINGUAGEM MODERNA: Escreva de forma atual e elegante, sem termos arcaicos. A leitura deve ser fluida como um livro contemporâneo de alta qualidade no idioma escolhido.
+3. DINÂMICA NARRADOR X PERSONAGEM:
+- O "Personagem Principal" é o SUJEITO da história.
 - O "Narrador" é A VOZ que escreve a carta.
-- Se o Narrador for o próprio Personagem Principal: Escreva em 1ª pessoa (Eu vi, Eu fiz).
-- Se o Narrador for uma testemunha/terceira pessoa: Escreva em 3ª pessoa (Ele viu, Ele fez), mas como um relato direto, observacional e cheio de emoção para o Destinatário.
-3. FIDELIDADE BÍBLICA: NÃO INVENTE fatos, nomes ou locais. Mantenha TODOS os detalhes bíblicos exatos da história fornecida, apenas adapte a forma de contar.
-4. APLICAÇÃO DO TOM (use como tempero na escrita):
-- Poético: Metáforas modernas e beleza estética nas palavras.
-- Urgente: Ritmo acelerado, frases curtas, pressa.
-- Materno: Acolhimento, cuidado contemporâneo e profundo afeto.
-- Solene: Reverência, peso e gravidade nas situações.
-- Mistério e Aventura: Suspense, tensão, atmosfera de desconhecido, revelações gradativas e ritmo de um thriller/adventure moderno.
-5. EXTENSÃO EXATA: Obedeça estritamente à quantidade de PÁGINAS POR CARTA (1 página = aprox. 3 parágrafos longos e densos).
-6. ESTRUTURA: Divida na quantidade de cartas exata. Use um cabeçalho contextual em itálico no início de cada carta. Crie despedidas marcantes.
-7. FORMATAÇÃO: Separe as cartas usando EXATAMENTE três traços: ---
-8. PROIBIÇÃO TOTAL: NÃO adicione dicas de curadoria, papel, aroma, ou "Snail Mail". Apenas escreva o manuscrito."""
+- Se o Narrador for o próprio Personagem Principal: Escreva em 1ª pessoa.
+- Se o Narrador for uma testemunha/terceira pessoa: Escreva em 3ª pessoa, mas com emoção.
+4. FIDELIDADE BÍBLICA: NÃO INVENTE fatos. Mantenha TODOS os detalhes exatos da história fornecida, apenas traduzindo/adaptando a narrativa para o idioma correto.
+5. APLICAÇÃO DO TOM (adapte a cultura do idioma escolhido): 
+- Poético: Metáforas modernas; 
+- Urgente: Ritmo acelerado; 
+- Materno: Acolhimento profundo; 
+- Solene: Reverência; 
+- Mistério e Aventura: Suspense, tensão, revelações.
+6. EXTENSÃO EXATA: Obedeça à quantidade de PÁGINAS POR CARTA (1 página = aprox. 3 parágrafos longos).
+7. ESTRUTURA: Divida nas cartas exatas. Cabeçalho contextual em itálico. Despedidas marcantes. Separe com ---.
+8. PROIBIÇÃO TOTAL: NÃO adicione dicas de curadoria, papel, aroma, ou "Snail Mail"."""
 
 if gerar_btn:
     if not personagem or not historia or not narrador:
@@ -87,12 +89,12 @@ if gerar_btn:
         paragrafos_esperados = paginas_por_carta * 3
         max_tokens = (paginas_por_carta * 800) * divisoes 
 
-        with st.spinner(f'Preparando a tinta... Redigindo {divisoes} cartas de {paginas_por_carta} páginas cada.'):
+        with st.spinner(f'Preparando a tinta... Redigindo em {idioma}...'):
             try:
                 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
                 
-                # Adicionado o narrador ao prompt do usuário
-                user_prompt = f"Personagem Principal (Sujeito): {personagem}\nNarrador (Voz que escreve): {narrador}\nDestinatário: {destinatario}\nTom: {tomm}\nDivisões: {divisoes} cartas.\nTAMANHO: Cada carta deve ter {paginas_por_carta} páginas (aproximadamente {paragrafos_esperados} parágrafos longos).\nVersão: {versao}\nHistória Base: {historia}\n\nEscreva os manuscritos agora."
+                # Passando o idioma no prompt
+                user_prompt = f"Idioma de Saída: {idioma}\nPersonagem Principal (Sujeito): {personagem}\nNarrador (Voz que escreve): {narrador}\nDestinatário: {destinatario}\nTom: {tomm}\nDivisões: {divisoes} cartas.\nTAMANHO: Cada carta deve ter {paginas_por_carta} páginas (aproximadamente {paragrafos_esperados} parágrafos longos).\nVersão Bíblica de referência: {versao}\nHistória Base: {historia}\n\nEscreva os manuscritos agora."
                 
                 response = client.chat.completions.create(
                     model="gpt-4o", 
