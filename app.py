@@ -32,27 +32,6 @@ st.markdown("""<style>
 .parchment-container h1, .parchment-container h2, .parchment-container h3 { font-family: 'MedievalSharp', cursive; color: #5c3a1e; border-bottom: 1px solid #8b6914; padding-bottom: 10px; margin-top: 30px; font-size: 1.6rem; }
 .parchment-container strong { color: #8b0000; }
 .divider-gold { border-top: 2px solid #5c3a1e; margin: 30px 0; box-shadow: 0px -2px 10px rgba(201, 168, 76, 0.3); }
-
-/* ESTILO DO BOTÃO DE PDF */
-.pdf-btn { background: #3e2c18; color: #e6dcc3; font-family: 'MedievalSharp', cursive; font-size: 1.2rem; border: 2px solid #c9a84c; border-radius: 8px; padding: 12px 24px; cursor: pointer; transition: all 0.3s ease; display: inline-block; text-decoration: none; }
-.pdf-btn:hover { background: #c9a84c; color: #1a1209; }
-
-/* MODO DE IMPRESSÃO / PDF (ESCONDE TUDO E DEIXA SÓ O PERGAMINHO) */
-@media print {
-    body { background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    .stApp, .main { background: white !important; padding: 0 !important; margin: 0 !important; overflow: visible !important; }
-    [data-testid="stSidebar"], .stButton, .stTextInput, .stTextArea, .stSelectbox, .stNumberInput, .divider-gold, .main-title, .subtitle, #MainMenu, header, footer, .stToolbar, .pdf-container { display: none !important; }
-    .parchment-container { 
-        border: 2px solid #5c3a1e !important; 
-        box-shadow: none !important; 
-        padding: 20px !important; 
-        margin: 0 !important;
-        color: #2b1d0e !important;
-        background: white !important;
-        font-size: 12pt !important; 
-        line-height: 1.5 !important;
-    }
-}
 </style>""", unsafe_allow_html=True)
 
 st.markdown('<div class="main-title">📜 O Escriba</div>', unsafe_allow_html=True)
@@ -63,7 +42,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     personagem = st.text_input("👤 Personagem Principal", help="De quem a história é sobre?")
-    narrador = st.text_input("🗣️ Narrador", help="Quem está escrevendo? Pode ser o próprio personagem ou uma testemunha ocular.")
+    narrador = st.text_input("🗣️ Narrador", help="Quem está escrevendo? Pode ser o próprio personagem ou uma testemunha ocular (ex: um anjo, um discípulo, etc).")
     destinatario = st.text_input("✉️ Destinatário")
     tomm = st.selectbox("🎭 Tom", ["Poético", "Urgente", "Materno", "Solene", "Mistério e Aventura"])
 
@@ -77,20 +56,29 @@ historia = st.text_area("📖 História Bíblica", height=150)
 st.markdown("")
 gerar_btn = st.button("✒️ Redigir Manuscritos", type="primary", use_container_width=True)
 
+# ==========================================
+# NOVO PROMPT: LINGUAGEM MODERNA + NARRADOR
+# ==========================================
 SYSTEM_PROMPT = """Você é um mestre da escrita épica e adaptador de histórias bíblicas. Sua missão é transformar relatos em manuscritos imersivos, usando uma LINGUAGEM MODERNA E ACESSÍVEL.
 
 REGRA ABSOLUTAS (NÃO QUEBRE NENHUMA DESSAS):
-1. LINGUAGEM MODERNA: Escreva em português atual, elegante, mas sem termos arcaicos. A leitura deve ser fluida como um livro contemporâneo de alta qualidade.
+1. LINGUAGEM MODERNA: Escreva em português atual, elegante, mas sem termos arcaicos ou rebuscados excessivamente (não force palavras como "sículos", "papiros" se não fluir naturalmente). A leitura deve ser fluida como um livro contemporâneo de alta qualidade.
 2. DINÂMICA NARRADOR X PERSONAGEM:
-- O "Personagem Principal" é o SUJEITO da história.
+- O "Personagem Principal" é o SUJEITO da história (sobre quem estamos falando).
 - O "Narrador" é A VOZ que escreve a carta.
 - Se o Narrador for o próprio Personagem Principal: Escreva em 1ª pessoa (Eu vi, Eu fiz).
-- Se o Narrador for uma testemunha/terceira pessoa: Escreva em 3ª pessoa (Ele viu, Ele fez), mas como um relato direto, observacional e cheio de emoção.
-3. FIDELIDADE BÍBLICA: NÃO INVENTE fatos. Mantenha TODOS os detalhes exatos da história fornecida.
-4. APLICAÇÃO DO TOM: Poético (metáforas modernas); Urgente (ritmo acelerado); Materno (acolhimento profundo); Solene (reverência); Mistério e Aventura (suspense, tensão, revelações).
-5. EXTENSÃO EXATA: Obedeça à quantidade de PÁGINAS POR CARTA (1 página = aprox. 3 parágrafos longos).
-6. ESTRUTURA: Divida nas cartas exatas. Cabeçalho contextual em itálico. Despedidas marcantes. Separe com ---.
-7. PROIBIÇÃO TOTAL: NÃO adicione dicas de curadoria, papel, aroma, ou "Snail Mail"."""
+- Se o Narrador for uma testemunha/terceira pessoa: Escreva em 3ª pessoa (Ele viu, Ele fez), mas como um relato direto, observacional e cheio de emoção para o Destinatário.
+3. FIDELIDADE BÍBLICA: NÃO INVENTE fatos, nomes ou locais. Mantenha TODOS os detalhes bíblicos exatos da história fornecida, apenas adapte a forma de contar.
+4. APLICAÇÃO DO TOM (use como tempero na escrita):
+- Poético: Metáforas modernas e beleza estética nas palavras.
+- Urgente: Ritmo acelerado, frases curtas, pressa.
+- Materno: Acolhimento, cuidado contemporâneo e profundo afeto.
+- Solene: Reverência, peso e gravidade nas situações.
+- Mistério e Aventura: Suspense, tensão, atmosfera de desconhecido, revelações gradativas e ritmo de um thriller/adventure moderno.
+5. EXTENSÃO EXATA: Obedeça estritamente à quantidade de PÁGINAS POR CARTA (1 página = aprox. 3 parágrafos longos e densos).
+6. ESTRUTURA: Divida na quantidade de cartas exata. Use um cabeçalho contextual em itálico no início de cada carta. Crie despedidas marcantes.
+7. FORMATAÇÃO: Separe as cartas usando EXATAMENTE três traços: ---
+8. PROIBIÇÃO TOTAL: NÃO adicione dicas de curadoria, papel, aroma, ou "Snail Mail". Apenas escreva o manuscrito."""
 
 if gerar_btn:
     if not personagem or not historia or not narrador:
@@ -102,6 +90,8 @@ if gerar_btn:
         with st.spinner(f'Preparando a tinta... Redigindo {divisoes} cartas de {paginas_por_carta} páginas cada.'):
             try:
                 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+                
+                # Adicionado o narrador ao prompt do usuário
                 user_prompt = f"Personagem Principal (Sujeito): {personagem}\nNarrador (Voz que escreve): {narrador}\nDestinatário: {destinatario}\nTom: {tomm}\nDivisões: {divisoes} cartas.\nTAMANHO: Cada carta deve ter {paginas_por_carta} páginas (aproximadamente {paragrafos_esperados} parágrafos longos).\nVersão: {versao}\nHistória Base: {historia}\n\nEscreva os manuscritos agora."
                 
                 response = client.chat.completions.create(
@@ -114,17 +104,6 @@ if gerar_btn:
                     max_tokens=max_tokens
                 )
                 manuscript_text = response.choices[0].message.content
-                
-                # Renderiza o texto
                 st.markdown(f'<div class="parchment-container">{manuscript_text.replace(chr(10), "<br>")}</div>', unsafe_allow_html=True)
-                
-                # BOTÃO DE SALVAR EM PDF (Aparece logo abaixo do texto)
-                st.markdown("""
-                <div class="pdf-container" style="text-align: center; margin-bottom: 50px;">
-                    <button class="pdf-btn" onclick="window.print()">📥 Salvar Manuscrito em PDF</button>
-                    <p style="font-size: 0.9rem; color: #a89272; margin-top: 5px;">(Ao clicar, escolha 'Salvar como PDF' na janela que abrir)</p>
-                </div>
-                """, unsafe_allow_html=True)
-                
             except Exception as e:
                 st.error(f"Erro ao contactar o escriba: {e}")
